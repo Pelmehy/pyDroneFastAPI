@@ -1,5 +1,4 @@
 import sys
-
 sys.path.insert(1, 'C:/forme/pyDrne/pyDroneFastApi')
 
 from redis_om import get_redis_connection
@@ -55,6 +54,8 @@ def controls_loop():
     cur_drone_gps.save()
     r.set('cur_drone_gps', cur_drone_gps.pk)
 
+    print('connected')
+
     while True:
         print('it works!')
         if not drone_info.is_connected:
@@ -70,9 +71,9 @@ def controls_loop():
         # set cur gps pos
         gps = drone.get_gps_position()
 
-        cur_drone_gps.lat = gps.gps.lat
-        cur_drone_gps.lon = gps.gps.lon
-        cur_drone_gps.alt = gps.gps.alt
+        cur_drone_gps.lat = gps.lat
+        cur_drone_gps.lon = gps.lon
+        cur_drone_gps.alt = gps.alt
         cur_drone_gps.save()
 
     r.execute_command('FLUSHALL')
