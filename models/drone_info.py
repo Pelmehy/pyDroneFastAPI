@@ -1,13 +1,13 @@
-from redis_om import JsonModel, get_redis_connection
+from redis_om import HashModel, get_redis_connection
 redis = get_redis_connection(port=6379)
 
-class Drone_info(JsonModel):
+class Drone_info(HashModel):
     app_mode: str           # go_to / velocity / landing
-    is_connected: bool
+    is_connected: int
 
 
-class Drone_settings(JsonModel):
-    is_connected: bool
-    arm: bool
-    is_took_off: bool
+class Drone_settings(HashModel):
+    is_connected: int
+    arm: int
+    is_took_off: int
     ground_speed: float     # m/s
