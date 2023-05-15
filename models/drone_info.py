@@ -4,6 +4,7 @@ redis = get_redis_connection(port=6379)
 class Drone_info(HashModel):
     app_mode: str           # go_to / velocity / landing
     is_connected: int
+    is_active: int
 
 
 class Drone_settings(HashModel):

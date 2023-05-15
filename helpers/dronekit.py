@@ -415,9 +415,13 @@ class DroneControls:
         self.cur_gps_pos['alt'] = gps.alt
 
     def set_info(self, info: Drone_info):
-        print(info.app_mode)
+        print('set info here')
         if info.app_mode in self.app_mode_list:
             self.mode = self.app_mode_list[info.app_mode]
+            self.app_mode = info.app_mode
+
+        print('mode: ', self.mode)
+        print('app_mode: ', self.app_mode)
 
     def set_api(
             self,

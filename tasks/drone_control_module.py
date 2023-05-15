@@ -1,4 +1,7 @@
 import sys
+import time
+import socketio
+
 sys.path.insert(1, 'C:/forme/pyDrne/pyDroneFastApi')
 
 from redis_om import get_redis_connection
@@ -11,15 +14,16 @@ from models.gps import Cur_gps, Go_to_gps
 from helpers.dronekit import DroneControls
 
 r = get_redis_connection(port=6379)
+sio = socketio.Client()
 
 def controls_loop():
+    # DEBUG:
+    sio.connect('http://localhost:5000')
+
     drone_info = Drone_info(
         is_connected=0,
-        arm=0,
-        is_took_off=0,
-        mode='GUIDED',
+        is_active=1,
         app_mode='landing',
-        ground_speed=0
     )
     drone_info.save()  # pk available inside model
     r.set('drone_info', drone_info.pk)
@@ -56,12 +60,20 @@ def controls_loop():
 
     print('connected')
 
+    if drone.vehicle:
+        sio.emit('drone_connection', {'status': 'success'})
+    else:
+        sio.emit('drone_connection', {'status': 'not_connected'})
+        drone_info.is_connected = 0
+
     while True:
-        print('it works!')
         if not drone_info.is_connected:
             drone.disconnect()
-            return
+            print('process finished')
+            break
         drone_info = Drone_info.get(drone_info.pk)
+        print(drone_info)
+
         drone_controls = Controls.get(drone_controls.pk)
         drone_go_to_gps = Go_to_gps.get(drone_go_to_gps.pk)
 
@@ -71,13 +83,32 @@ def controls_loop():
         # set cur gps pos
         gps = drone.get_gps_position()
 
+        sio.emit(
+            'cur_drone_gps',
+            {
+                'lat': gps.lat,
+                'lon': gps.lon,
+                'alt': gps.alt
+            }
+        )
+
+        sio.emit(
+            'drone_settings',
+            {
+                'is_connected': True,
+                'arm': drone.arm,
+                'is_took_off': drone.is_took_off,
+                'ground_speed': drone.ground_speed
+            }
+        )
+
         cur_drone_gps.lat = gps.lat
         cur_drone_gps.lon = gps.lon
         cur_drone_gps.alt = gps.alt
         cur_drone_gps.save()
 
+        time.sleep(1)
+
     r.execute_command('FLUSHALL')
 
-
-if __name__ == '__main__':
-    controls_loop()
+controls_loop()
