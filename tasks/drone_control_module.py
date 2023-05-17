@@ -89,9 +89,11 @@ def controls_loop():
             {
                 'cur_lat': gps.lat,
                 'cur_lon': gps.lon,
-                'cur_alt': gps.alt
+                'cur_alt': gps.alt,
+                'yaw': drone.vehicle.attitude.yaw
             }
         )
+        print('yaw: ', drone.vehicle.attitude.yaw)
 
         sio.emit(
             'drone_settings',
@@ -99,7 +101,7 @@ def controls_loop():
                 'app_mode': drone.app_mode,
                 'arm': drone.arm,
                 'is_took_off': drone.is_took_off,
-                'ground_speed': drone.ground_speed
+                'ground_speed': drone.ground_speed,
             }
         )
 

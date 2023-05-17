@@ -108,30 +108,6 @@ class DroneControls:
     def is_error(self):
         return self.app_error['is_error']
 
-    def send_controls(self):
-        if not self.controls['is_took_off'] and not self.controls['simple_takeoff']:
-            return
-        elif not self.controls['is_took_off'] and self.controls['simple_takeoff']:
-            self.arm_and_takeoff(5)
-            self.set_controls('is_took_off', True)
-            self.set_controls('simple_takeoff', False)
-        elif self.is_armed and not self.arm:
-            self.vehicle.mode = self.mode_list['rtl']
-            self.set_controls('is_took_off', False)
-
-            return
-
-        if self.controls['is_velocity_mode']:
-            self.send_velocity(self.controls['vx'], self.controls['vy'], self.controls['vz'], self.duration)
-
-            if self.controls['yaw'] != 0:
-                self.condition_yaw(self.controls['yaw'])
-                self.set_controls('yaw')
-        elif self.go_to_gps['is_go_to_mode']:
-            # TODO add goto function
-            print('in dev')
-        return
-
     def temp_terminal(self):
         command = 0
 
@@ -206,7 +182,6 @@ class DroneControls:
             self.send_velocity(self.controls['vx'], self.controls['vy'], self.controls['vz'], self.duration)
             if self.controls['yaw'] != 0:
                 self.condition_yaw(self.controls['yaw'])
-                self.set_controls('yaw')
         elif self.app_mode == 'landing':
             self.return_to_landing_pad()
             self.is_took_off = False
