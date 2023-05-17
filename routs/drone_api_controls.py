@@ -39,6 +39,7 @@ async def connect():
     )
 
     print('end')
+
     return {'status': 'success'}
 
 
@@ -182,11 +183,18 @@ async def go_to_mode():
 
 @router.post('/gps_set/{lat}/{lon}/{alt}')
 async def gps_set(lat, lon, alt):
-    return {
-        'lat': lat,
-        'lon': lon,
-        'alt': alt
-    }
+    drone_gps_go_to = redis_helper.get_drone_go_to_gps(r)
+    if not drone_gps_go_to:
+        return {'status': 'drone not connected'}
+    print(lat, lon, alt)
+    drone_gps_go_to.go_to_lat = lat
+    drone_gps_go_to.go_to_lon = lon
+    drone_gps_go_to.go_to_alt = alt
+    drone_gps_go_to.save()
+
+    print(drone_gps_go_to)
+
+    return {'status': 'drone not connected'}
 
 
 @router.post('/landing_mode')

@@ -15,10 +15,11 @@ from helpers.dronekit import DroneControls
 
 r = get_redis_connection(port=6379)
 sio = socketio.Client()
+app = socketio.WSGIApp(sio)
 
+@sio.event
 def controls_loop():
-    # DEBUG:
-    sio.connect('http://localhost:5000')
+    sio.connect('http://localhost:5000', wait_timeout=5)
 
     drone_info = Drone_info(
         is_connected=0,
@@ -86,16 +87,16 @@ def controls_loop():
         sio.emit(
             'cur_drone_gps',
             {
-                'lat': gps.lat,
-                'lon': gps.lon,
-                'alt': gps.alt
+                'cur_lat': gps.lat,
+                'cur_lon': gps.lon,
+                'cur_alt': gps.alt
             }
         )
 
         sio.emit(
             'drone_settings',
             {
-                'is_connected': True,
+                'app_mode': drone.app_mode,
                 'arm': drone.arm,
                 'is_took_off': drone.is_took_off,
                 'ground_speed': drone.ground_speed

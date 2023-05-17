@@ -60,7 +60,7 @@ class DroneControls:
     }
 
     ground_speed = 0.0
-    duration = 5
+    duration = 1
 
     arm = False
     is_connected = True
@@ -201,8 +201,7 @@ class DroneControls:
                 'invalid app mode\n please use one of supported:\n take_off\ngo_to\nvelocity\nlanding\ndisconnect'
             )
         elif self.app_mode == 'go_to':
-            # add goto function
-            print('in dev')
+            self.gps_go_to()
         elif self.app_mode == 'velocity':
             self.send_velocity(self.controls['vx'], self.controls['vy'], self.controls['vz'], self.duration)
             if self.controls['yaw'] != 0:
@@ -356,7 +355,7 @@ class DroneControls:
     # **************************
     # speed and height control
     # **************************
-    def condition_yaw(self, heading, relative=True):
+    def condition_yaw(self, heading, relative=False):
         if relative:
             is_relative = 1  # yaw relative to direction of travel
         else:
@@ -406,7 +405,7 @@ class DroneControls:
 
     def set_go_to(self, gps: Go_to_gps):
         self.go_to_gps['lat'] = gps.go_to_lat
-        self.go_to_gps['lot'] = gps.go_to_lon
+        self.go_to_gps['lon'] = gps.go_to_lon
         self.go_to_gps['alt'] = gps.go_to_alt
 
     def set_cur_gps(self, gps):
@@ -465,3 +464,18 @@ class DroneControls:
 
     def return_to_landing_pad(self):
         self.vehicle.mode = dronekit.VehicleMode(self.app_mode_list[self.app_mode])
+
+    def gps_go_to(self):
+        dronekit.VehicleMode(self.mode)
+
+        print(
+            self.go_to_gps
+        )
+
+        point_go_to = dronekit.LocationGlobalRelative(
+            self.go_to_gps['lat'],
+            self.go_to_gps['lon'],
+            self.go_to_gps['alt']
+        )
+
+        self.vehicle.simple_goto(point_go_to, groundspeed=5)
