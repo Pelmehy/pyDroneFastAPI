@@ -68,10 +68,6 @@ def controls_loop():
         drone_info.is_connected = 0
 
     while True:
-        if not drone_info.is_connected:
-            drone.disconnect()
-            print('process finished')
-            break
         drone_info = Drone_info.get(drone_info.pk)
         print(drone_info)
 
@@ -109,6 +105,13 @@ def controls_loop():
         cur_drone_gps.lon = gps.lon
         cur_drone_gps.alt = gps.alt
         cur_drone_gps.save()
+
+        if not drone_info.is_connected:
+            drone.return_to_landing_pad()
+            time.sleep(1)
+            drone.disconnect()
+            print('process finished')
+            return 0
 
         time.sleep(1)
 

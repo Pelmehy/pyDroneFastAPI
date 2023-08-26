@@ -193,6 +193,7 @@ class DroneControls:
             self.return_to_landing_pad()
             self.is_connected = False
 
+
         return True
 
     def update_settings(self):
@@ -310,6 +311,7 @@ class DroneControls:
             self.drone_error = 'Some other error!'
 
     def disconnect(self):
+        self.return_to_landing_pad()
         self.vehicle.close()
 
     def check_connection(self):
@@ -438,7 +440,8 @@ class DroneControls:
         self.is_took_off = True
 
     def return_to_landing_pad(self):
-        self.vehicle.mode = dronekit.VehicleMode(self.app_mode_list[self.app_mode])
+        print('RTL')
+        self.vehicle.mode = dronekit.VehicleMode(self.app_mode_list['landing'])
 
     def gps_go_to(self):
         dronekit.VehicleMode(self.mode)
